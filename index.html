@@ -335,6 +335,8 @@ footer{border-top:1px solid var(--line)}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+#hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.45;z-index:1;pointer-events:none}
+#pcv{z-index:2}
 </style>
 </head>
 <body>
@@ -367,6 +369,7 @@ footer{border-top:1px solid var(--line)}
 <main>
 <!-- ==================== 1 / HERO ==================== -->
 <section id="hero">
+  <video id="hero-video" src="mk1-hero.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>
   <canvas id="pcv" aria-hidden="true"></canvas>
   <span class="fc a"></span><span class="fc b"></span><span class="fc c"></span><span class="fc d"></span>
   <span class="coord l">12.9716&#176; N — 77.5946&#176; E // BENGALURU HQ</span>
