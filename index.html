@@ -1,1 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAPT Defence Systems — Autonomous Micro Surveillance, Made in India</title>
+<meta name="description" content="MK-1 — a 40-gram autonomous micro surveillance UAV. Silent. Intelligent. Lethal. Designed, built and deployed in India.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Cpath d='M16 5 27 26H5Z' fill='none' stroke='%230066FF' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='19' r='2.6' fill='%230066FF'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS / RESET ============ */
+:root{
+  --black:#000000; --panel:#111111; --panel2:#0b0b0d;
+  --line:#222222; --line2:#2c2c31;
+  --blue:#0066FF; --blue-hi:#5AA7FF; --blue-dim:rgba(0,102,255,.28);
+  --white:#FFFFFF; --grey:#9aa0ab; --grey-d:#565b66; --red:#FF3B30;
+  --fh:'Rajdhani',sans-serif; --fm:'Share Tech Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:var(--black);color:var(--white);font-family:var(--fh);font-weight:500;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  /* blueprint grid texture — hairline minor grid + blue major grid + plus-markers */
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(rgba(0,102,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,102,255,.05) 1px,transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cpath d='M96 100h8M100 96v8' stroke='%23004bb3' stroke-opacity='.5' stroke-width='1'/%3E%3C/svg%3E");
+  background-size:40px 40px,40px 40px,200px 200px,200px 200px,200px 200px;
+}
+::selection{background:var(--blue);color:#000}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:#000}
+::-webkit-scrollbar-thumb{background:#26262c;border:2px solid #000}
+::-webkit-scrollbar-thumb:hover{background:var(--blue)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+.lbl{font-family:var(--fm);font-size:11px;letter-spacing:.28em;color:var(--blue-hi)}
+.sq{display:inline-block;width:5px;height:5px;background:var(--blue);vertical-align:middle}
 
+/* ============ NAV ============ */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:900;border-bottom:1px solid transparent;transition:background .3s,border-color .3s}
+#topbar.solid{background:rgba(0,0,0,.88);backdrop-filter:blur(10px);border-bottom-color:var(--line)}
+.nav{display:flex;align-items:center;gap:32px;height:66px;max-width:1240px;margin:0 auto;padding:0 28px}
+.logo{display:flex;align-items:center;gap:11px}
+.logo svg{width:24px;height:24px;flex:none}
+.logo .lt{display:flex;flex-direction:column;line-height:1}
+.logo .lt b{font-size:21px;font-weight:700;letter-spacing:.08em}
+.logo .lt span{font-family:var(--fm);font-size:7.5px;letter-spacing:.34em;color:var(--grey);margin-top:3px}
+.nav-links{display:flex;gap:26px;margin-left:auto;align-items:center}
+.nav-links a{font-family:var(--fm);font-size:11px;letter-spacing:.22em;color:var(--grey);padding:6px 0;border-bottom:1px solid transparent;transition:color .2s,border-color .2s}
+.nav-links a:hover,.nav-links a.act{color:var(--white);border-bottom-color:var(--blue)}
+.sys{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:10px;letter-spacing:.2em;color:var(--grey)}
+.sys i{width:6px;height:6px;background:var(--blue);animation:blink2 2.2s infinite}
+#burger{display:none;margin-left:auto;background:none;border:1px solid var(--line2);color:#fff;width:42px;height:42px;align-items:center;justify-content:center}
+#burger svg{width:18px;height:18px}
+#burger .x{display:none}
+#burger.on .m{display:none}
+#burger.on .x{display:block}
+
+/* ============ BUTTONS ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  background:var(--blue);color:#fff;border:1px solid var(--blue);
+  font:700 14px/1 var(--fh);letter-spacing:.24em;text-transform:uppercase;
+  padding:17px 36px;transition:background .18s,color .18s,border-color .18s;white-space:nowrap}
+.btn:hover{background:#fff;color:#000;border-color:#fff}
+.btn.ghost{background:transparent;color:#fff;border-color:var(--line2)}
+.btn.ghost:hover{background:transparent;color:var(--blue-hi);border-color:var(--blue)}
+.btn.sm{padding:11px 20px;font-size:12px}
+.btn .ar{width:14px;height:14px}
+
+/* ============ HERO ============ */
+#hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+#pcv{position:absolute;inset:0;pointer-events:none}
+.hero-in{position:relative;z-index:2;padding:120px 24px 90px}
+.hero-in>*{animation:rise .8s cubic-bezier(.2,.7,.2,1) both}
+.hero-in>*:nth-child(2){animation-delay:.1s}
+.hero-in>*:nth-child(3){animation-delay:.2s}
+.hero-in>*:nth-child(4){animation-delay:.3s}
+.hero-in>*:nth-child(5){animation-delay:.42s}
+.overline{font-family:var(--fm);font-size:11px;letter-spacing:.3em;color:var(--blue-hi)}
+h1{margin-top:26px}
+h1 .t1{display:block;font-size:clamp(92px,17vw,218px);font-weight:700;line-height:.86;letter-spacing:.015em}
+h1 .t2{display:block;font-size:clamp(14px,2.7vw,30px);font-weight:600;letter-spacing:.56em;margin-top:30px;margin-right:-.56em;color:var(--white)}
+.hero-sub{margin-top:30px;font-family:var(--fm);font-size:clamp(12px,1.5vw,15px);letter-spacing:.18em;color:var(--grey)}
+.hero-sub em{font-style:normal;color:var(--blue-hi)}
+.tag{margin-top:26px;display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap}
+.tag span{font:600 clamp(12px,1.4vw,15px) var(--fh);letter-spacing:.34em;color:var(--white)}
+.tag i{width:5px;height:5px;background:var(--blue)}
+.hero-cta{margin-top:44px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.fc{position:absolute;width:22px;height:22px;z-index:2;border:0 solid var(--blue-dim)}
+.fc.a{top:88px;left:26px;border-top-width:1px;border-left-width:1px}
+.fc.b{top:88px;right:26px;border-top-width:1px;border-right-width:1px}
+.fc.c{bottom:26px;left:26px;border-bottom-width:1px;border-left-width:1px}
+.fc.d{bottom:26px;right:26px;border-bottom-width:1px;border-right-width:1px}
+.coord{position:absolute;bottom:22px;font-family:var(--fm);font-size:10px;letter-spacing:.18em;color:#4b5260;z-index:2}
+.coord.l{left:58px}.coord.r{right:58px}
+#hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--blue);
+  transform-origin:left;animation:lineGrow 1.1s .5s cubic-bezier(.75,0,.2,1) both}
+
+/* ============ SECTION SCAFFOLD ============ */
+section{padding:108px 0;border-top:1px solid #141418}
+.sec-head{display:grid;grid-template-columns:1fr auto;gap:16px 60px;align-items:end;margin-bottom:56px}
+.sec-head h2{font-size:clamp(36px,4.8vw,62px);font-weight:700;line-height:.95;letter-spacing:.01em;text-transform:uppercase;margin-top:14px}
+.sec-head h2 b{color:var(--blue)}
+.sec-p{max-width:420px;color:var(--grey);font-size:15.5px;line-height:1.65;padding-bottom:6px}
+.sec-p em{font-style:normal;color:var(--blue-hi)}
+
+/* ============ MK-1 STAGE ============ */
+.stage{position:relative;height:clamp(440px,74vh,640px);background:#050507;border:1px solid var(--line);overflow:hidden;perspective:1200px}
+.stage-tag{position:absolute;top:18px;right:22px;z-index:5;font-family:var(--fm);font-size:10px;letter-spacing:.24em;color:var(--grey-d)}
+.rec{position:absolute;bottom:18px;left:22px;z-index:5;display:flex;align-items:center;gap:9px;font-family:var(--fm);font-size:10px;letter-spacing:.2em;color:var(--grey-d)}
+.rec i{width:7px;height:7px;background:var(--red);animation:blink2 1.4s infinite}
+.rec b{color:var(--grey)}
+/* telemetry rail */
+.tele{position:absolute;top:20px;left:22px;z-index:5;display:flex;flex-direction:column;gap:9px;width:158px}
+.t-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #16161b;padding-bottom:7px;font-family:var(--fm);font-size:10px;letter-spacing:.14em}
+.t-row span{color:var(--grey-d)}
+.t-row b{color:var(--grey);font-weight:400}
+.bars{display:flex;gap:3px}
+.bars i{width:9px;height:5px;background:#26262e}
+.bars i.on{background:var(--blue)}
+/* 3D tilt wrapper */
+.par{position:absolute;inset:0;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+/* ground plane */
+.floor{position:absolute;left:-8%;right:-8%;bottom:0;height:58%;transform-origin:center top;transform:perspective(760px) rotateX(63deg);
+  background-image:linear-gradient(rgba(0,102,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(0,102,255,.07) 1px,transparent 1px);
+  background-size:46px 46px;border-top:1px solid rgba(0,102,255,.35)}
+.ring{position:absolute;left:50%;top:20%;width:110px;height:110px;margin:-55px 0 0 -55px;border:1px solid rgba(0,102,255,.5);
+  border-radius:50%;animation:ping 3.9s cubic-bezier(.1,.5,.3,1) infinite}
+.ring.d2{animation-delay:-1.3s}.ring.d3{animation-delay:-2.6s}
+.drone-shadow{position:absolute;left:50%;top:20%;width:290px;height:64px;background:rgba(0,0,0,.62);border-radius:50%;filter:blur(15px)}
+/* hologram */
+.holo{position:absolute;left:50%;top:47%;width:min(66%,470px);aspect-ratio:1;will-change:transform}
+.spin{position:absolute;inset:0;will-change:transform}
+.spin svg{width:100%;height:100%;display:block}
+.scan{position:absolute;left:5%;right:5%;top:8%;height:1.5px;background:rgba(90,167,255,.15);
+  box-shadow:0 0 10px rgba(0,102,255,.28);animation:scanY 4.6s linear infinite}
+/* svg part animations */
+.blades{animation:bladeSpin .5s linear infinite;transform-box:fill-box;transform-origin:center}
+.rim{animation:spinRev 90s linear infinite;transform-box:fill-box;transform-origin:center}
+.led,.beacon{animation:ledBlink 1.9s infinite}
+.chipTxt{font:9px var(--fm);fill:#4d5666;letter-spacing:1.5px}
+.bodyTxt{font:8px var(--fm);fill:#3f4652;letter-spacing:2.5px}
+/* HUD callouts */
+.co{position:absolute;display:flex;align-items:center;gap:12px;z-index:5;transition:color .35s}
+.co .txt{font-family:var(--fm);font-size:10px;letter-spacing:.2em;color:var(--grey-d);transition:color .35s}
+.co .ln{width:58px;border-top:1px dashed #2c3140;transition:border-color .35s}
+.co .dot{width:6px;height:6px;background:#2a2f3a;transition:background .3s,box-shadow .3s}
+.co.rt{flex-direction:row-reverse}
+.co.pulse .txt{color:var(--blue-hi)}
+.co.pulse .ln{border-color:var(--blue)}
+.co.pulse .dot{background:var(--blue-hi);box-shadow:0 0 12px rgba(0,102,255,.9)}
+.co.tl{top:15%;left:3.5%}.co.tr{top:15%;right:3.5%}
+.co.bl{bottom:17%;left:3.5%}.co.br{bottom:17%;right:3.5%}
+/* stats bar */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-top:none;background:#0a0a0d}
+.stat{padding:30px 28px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:none}
+.stat .v{display:flex;align-items:baseline;gap:10px}
+.stat b{font-size:clamp(42px,4.6vw,62px);font-weight:700;line-height:1}
+.stat i{font-family:var(--fm);font-style:normal;font-size:14px;color:var(--blue);letter-spacing:.1em}
+.stat span{display:block;margin-top:10px;font-family:var(--fm);font-size:10px;letter-spacing:.24em;color:var(--grey-d)}
+
+/* ============ CAPABILITIES ============ */
+.caps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.cap{position:relative;background:var(--panel);padding:30px 28px 26px;overflow:hidden;transition:background .25s}
+.cap::after{content:"";position:absolute;left:0;right:0;top:-2px;height:2px;background:var(--blue);opacity:0;transition:opacity .25s}
+.cap:hover{background:#141419}
+.cap:hover::after{opacity:1}
+.cap-idx{position:absolute;top:22px;right:24px;font-family:var(--fm);font-size:10px;letter-spacing:.2em;color:#3a3f4a}
+.cap-ic{width:34px;height:34px;color:var(--blue-hi);margin-bottom:22px;transition:transform .3s}
+.cap-ic svg{width:100%;height:100%}
+.cap:hover .cap-ic{transform:translateY(-3px)}
+.cap h3{font-size:19px;font-weight:700;letter-spacing:.1em}
+.cap p{margin-top:10px;font-size:14px;line-height:1.6;color:var(--grey);min-height:66px}
+.cap-spec{display:inline-block;margin-top:14px;border:1px solid var(--line2);padding:5px 10px;
+  font-family:var(--fm);font-size:9.5px;letter-spacing:.18em;color:var(--grey-d);transition:color .25s,border-color .25s}
+.cap:hover .cap-spec{color:var(--blue-hi);border-color:var(--blue-dim)}
+
+/* ============ COMPARISON ============ */
+.tbl-wrap{overflow-x:auto}
+.cmp{min-width:640px;border:1px solid var(--line)}
+.cmp-row{display:grid;grid-template-columns:1.15fr 1fr 1fr;align-items:stretch;border-top:1px solid #17171c}
+.cmp-row:first-child{border-top:none}
+.cmp-row>span{padding:19px 22px;display:flex;align-items:center;gap:12px;font-size:15px}
+.c-cap{font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#e8eaee}
+.c-us{background:rgba(0,102,255,.05);border-left:1px solid rgba(0,102,255,.3);border-right:1px solid rgba(0,102,255,.3);color:#dfe4ec}
+.c-them{color:#767c88}
+.cmp-row.head>span{font-family:var(--fm);font-size:11px;letter-spacing:.2em;padding:15px 22px}
+.cmp-row.head .c-cap{color:var(--grey-d)}
+.cmp-row.head .c-us{background:var(--blue);color:#000;font-weight:400;letter-spacing:.24em}
+.cmp-row.head .c-them{color:var(--grey-d)}
+.cmp-row:not(.head):hover{background:#0c0c10}
+.ic-ok,.ic-no{width:15px;height:15px;flex:none}
+.verdict{margin-top:1px;border:1px solid var(--line);border-top:none;background:#0a0a0d;display:flex;align-items:center;gap:28px;padding:24px 28px;flex-wrap:wrap}
+.verdict b{font-size:52px;font-weight:700;color:var(--blue);line-height:1}
+.verdict .vt{font-family:var(--fm);font-size:11px;letter-spacing:.24em;color:var(--grey)}
+.verdict .src{margin-top:8px;font-family:var(--fm);font-size:9.5px;letter-spacing:.12em;color:#4b5260}
+
+/* ============ INDIA ============ */
+#india .ig{display:grid;grid-template-columns:1.05fr .9fr;gap:72px;align-items:center}
+.cascade span{display:block;font-size:clamp(44px,6.4vw,92px);font-weight:700;line-height:1.02;letter-spacing:.01em}
+.cascade span:nth-child(2){margin-left:.65em}
+.cascade span:nth-child(3){margin-left:1.3em}
+.cascade span:nth-child(4){margin-left:1.95em}
+.cascade b{color:var(--blue);font-weight:inherit}
+.india-p{margin-top:30px;color:var(--grey);font-size:15.5px;line-height:1.7;max-width:480px}
+.india-p em{font-style:normal;color:var(--blue-hi)}
+.india-cta{margin-top:34px}
+.india-badges{margin-top:30px;font-family:var(--fm);font-size:10px;letter-spacing:.22em;color:#4b5260}
+/* map panel */
+.geo{position:relative;border:1px solid var(--line);background:var(--panel2);
+  background-image:linear-gradient(rgba(0,102,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,102,255,.04) 1px,transparent 1px);
+  background-size:30px 30px}
+.geo::before{content:"";position:absolute;top:-1px;left:-1px;width:15px;height:15px;border-top:2px solid var(--blue);border-left:2px solid var(--blue)}
+.geo::after{content:"";position:absolute;bottom:-1px;right:-1px;width:15px;height:15px;border-bottom:2px solid var(--blue);border-right:2px solid var(--blue)}
+.geo-head,.geo-foot{display:flex;justify-content:space-between;align-items:center;padding:13px 16px;font-family:var(--fm);font-size:9.5px;letter-spacing:.22em;color:var(--grey-d)}
+.geo-head{border-bottom:1px solid var(--line)}
+.geo-foot{border-top:1px solid var(--line)}
+.geo-head .live{display:flex;align-items:center;gap:8px;color:var(--blue-hi)}
+.geo-head .live i{width:6px;height:6px;background:var(--blue);animation:blink2 1.8s infinite}
+.geo-body{padding:18px 10px 8px}
+.map-svg{display:block;width:100%;height:auto}
+.in-fill{fill:rgba(0,102,255,.055);stroke:rgba(0,102,255,.65);stroke-width:1.4}
+.in-dash{fill:none;stroke:rgba(0,102,255,.22);stroke-width:1;stroke-dasharray:3 7}
+.sweep{fill:rgba(0,102,255,.07)}
+.sweep-edge{fill:rgba(90,167,255,.3)}
+.map-lbl{font:8.5px var(--fm);fill:#77839a;letter-spacing:1.2px}
+.map-lbl.hq{fill:var(--blue-hi)}
+
+/* ============ CONTACT ============ */
+#contact .cg{display:grid;grid-template-columns:1fr 1.15fr;gap:72px;align-items:start}
+#contact h2{font-size:clamp(36px,4.6vw,58px);font-weight:700;line-height:1;text-transform:uppercase;margin-top:14px}
+.c-info{margin-top:26px;color:var(--grey);font-size:15.5px;line-height:1.7;max-width:440px}
+.c-facts{margin-top:34px;border:1px solid var(--line)}
+.c-facts>div{display:flex;justify-content:space-between;gap:20px;padding:14px 18px;border-top:1px solid #17171c;font-family:var(--fm);font-size:10.5px;letter-spacing:.18em}
+.c-facts>div:first-child{border-top:none}
+.c-facts span{color:var(--grey-d)}
+.c-facts b{color:var(--grey);font-weight:400;text-align:right}
+/* form */
+.f-panel{position:relative;border:1px solid var(--line);background:var(--panel);padding:34px 34px 30px}
+.f-panel::before{content:"";position:absolute;top:-1px;left:-1px;width:15px;height:15px;border-top:2px solid var(--blue);border-left:2px solid var(--blue)}
+.f-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;font-family:var(--fm);font-size:10px;letter-spacing:.22em;color:var(--grey-d)}
+.f-head b{color:var(--blue-hi);font-weight:400}
+.f-row{margin-bottom:20px}
+.f-row label{display:block;font-family:var(--fm);font-size:10px;letter-spacing:.22em;color:var(--grey-d);margin-bottom:9px}
+.f-row label b{color:var(--blue-hi);font-weight:400}
+.f-row input,.f-row select{width:100%;background:#0a0a0d;border:1px solid var(--line2);color:#fff;
+  padding:14px 15px;font:500 15.5px var(--fh);letter-spacing:.04em;transition:border-color .15s;appearance:none}
+.f-row select{cursor:pointer;padding-right:40px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235AA7FF' stroke-width='2'%3E%3Cpath d='m5 9 7 7 7-7'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center}
+.f-row input:focus,.f-row select:focus{border-color:var(--blue);outline:none}
+.f-row input.bad{border-color:var(--red)}
+.err{display:none;margin-top:7px;font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;color:var(--red)}
+.err.on{display:block}
+.f-note{margin-top:18px;font-family:var(--fm);font-size:9px;letter-spacing:.14em;color:#4b5260;text-align:center}
+.f-mail{margin-top:1px;border:1px solid var(--line);border-top:none;background:#0a0a0d;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}
+.f-mail a{font-family:var(--fm);font-size:13px;letter-spacing:.1em;color:var(--grey);transition:color .2s}
+.f-mail a:hover{color:var(--blue-hi)}
+#copy-mail{background:none;border:1px solid var(--line2);color:var(--grey);font-family:var(--fm);font-size:9.5px;letter-spacing:.18em;padding:8px 13px;transition:.2s}
+#copy-mail:hover{border-color:var(--blue);color:var(--blue-hi)}
+/* success state */
+.f-done .lbl{display:block}
+.f-done h3{font-size:32px;font-weight:700;letter-spacing:.04em;margin:14px 0 12px}
+.f-done p{color:var(--grey);font-size:14.5px;line-height:1.7}
+.f-done .dm{margin:24px 0 26px;border:1px solid var(--line)}
+.f-done .dm div{display:flex;justify-content:space-between;padding:11px 16px;border-top:1px solid #17171c;font-family:var(--fm);font-size:10px;letter-spacing:.16em}
+.f-done .dm div:first-child{border-top:none}
+.f-done .dm span{color:var(--grey-d)}.f-done .dm b{color:var(--grey);font-weight:400}
+
+/* ============ FOOTER ============ */
+footer{border-top:1px solid var(--line)}
+.foot-top{display:flex;justify-content:space-between;align-items:center;gap:30px;padding:34px 0;flex-wrap:wrap}
+.foot-top .fn{font-family:var(--fm);font-size:10px;letter-spacing:.26em;color:var(--grey-d)}
+.foot-links{display:flex;gap:24px}
+.foot-links a{font-family:var(--fm);font-size:10px;letter-spacing:.2em;color:var(--grey-d);transition:color .2s}
+.foot-links a:hover{color:var(--blue-hi)}
+.foot-bot{border-top:1px solid #141418;padding:18px 0 26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  font-family:var(--fm);font-size:9px;letter-spacing:.2em;color:#3d434e}
+
+/* ============ TOAST ============ */
+#toasts{position:fixed;top:82px;right:22px;z-index:2000;display:flex;flex-direction:column;gap:10px}
+.toast{background:#101014;border:1px solid var(--line2);border-left:3px solid var(--blue);padding:14px 18px;
+  display:flex;align-items:center;gap:12px;font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:#dfe3ea;
+  animation:tIn .35s cubic-bezier(.2,.9,.3,1.1);max-width:340px}
+.toast svg{width:15px;height:15px;color:var(--blue);flex:none}
+.toast.out{opacity:0;transform:translateX(24px);transition:.35s}
+
+/* ============ REVEAL / KEYFRAMES ============ */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .75s ease,transform .75s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
+.reveal.in{opacity:1;transform:none}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}}
+@keyframes lineGrow{from{transform:scaleX(0)}}
+@keyframes bladeSpin{to{transform:rotate(360deg)}}
+@keyframes spinRev{to{transform:rotate(-360deg)}}
+@keyframes ledBlink{0%,68%{opacity:1}73%,100%{opacity:.12}}
+@keyframes blink2{0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes ping{from{transform:scale(.12);opacity:.9}to{transform:scale(4.3);opacity:0}}
+@keyframes scanY{from{top:8%}to{top:92%}}
+@keyframes tIn{from{opacity:0;transform:translateX(30px)}}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:1020px){
+  #india .ig{grid-template-columns:1fr;gap:56px}
+  #contact .cg{grid-template-columns:1fr;gap:48px}
+  .co{display:none}
+}
+@media(max-width:860px){
+  .nav-links,.sys{display:none}
+  #burger{display:flex}
+  .nav-links.open{display:flex;position:absolute;top:66px;left:0;right:0;background:#050507;border-bottom:1px solid var(--line);flex-direction:column;align-items:flex-start;gap:0;padding:10px 28px 20px}
+  .nav-links.open a{padding:13px 0;font-size:13px;width:100%}
+  .sec-head{grid-template-columns:1fr}
+  .caps{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:none;border-top:1px solid var(--line)}
+  .stat:nth-child(4){border-top:1px solid var(--line)}
+  .tele{display:none}
+}
+@media(max-width:560px){
+  section{padding:78px 0}
+  .caps{grid-template-columns:1fr}
+  .cascade span:nth-child(n){margin-left:0}
+  .coord{display:none}
+  .stage{height:400px}
+  .f-panel{padding:24px 20px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div id="toasts" aria-live="polite"></div>
+
+<!-- ==================== NAV ==================== -->
+<header id="topbar">
+  <nav class="nav">
+    <a class="logo" href="#hero" aria-label="RAPT Defence Systems — home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 28 27H4Z" fill="none" stroke="#0066FF" stroke-width="2.4"/><circle cx="16" cy="19" r="2.8" fill="#0066FF"/></svg>
+      <span class="lt"><b>RAPT</b><span>DEFENCE SYSTEMS</span></span>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="#mk1">MK-1</a>
+      <a href="#caps">CAPABILITIES</a>
+      <a href="#compare">COMPARISON</a>
+      <a href="#india">INDIA</a>
+      <a href="#contact">CONTACT</a>
+    </div>
+    <span class="sys"><i></i>SYSTEMS NOMINAL</span>
+    <a class="btn sm" href="#contact">REQUEST BRIEFING</a>
+    <button id="burger" aria-label="Menu">
+      <svg class="m" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      <svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </nav>
+</header>
+
+<main>
+<!-- ==================== 1 / HERO ==================== -->
+<section id="hero">
+  <canvas id="pcv" aria-hidden="true"></canvas>
+  <span class="fc a"></span><span class="fc b"></span><span class="fc c"></span><span class="fc d"></span>
+  <span class="coord l">12.9716&#176; N — 77.5946&#176; E // BENGALURU HQ</span>
+  <span class="coord r">MK-1 // MICRO-UAV PLATFORM</span>
+  <div class="hero-in">
+    <p class="overline">// INDIAN DEFENCE TECHNOLOGY — MICRO-UAV SYSTEMS //</p>
+    <h1><span class="t1">RAPT</span><span class="t2">DEFENCE SYSTEMS</span></h1>
+    <p class="hero-sub">AUTONOMOUS MICRO SURVEILLANCE <em>&mdash;</em> BUILT IN INDIA</p>
+    <div class="tag" aria-label="Silent. Intelligent. Lethal.">
+      <span>SILENT</span><i></i><span>INTELLIGENT</span><i></i><span>LETHAL</span>
+    </div>
+    <div class="hero-cta">
+      <a class="btn" href="#contact">REQUEST BRIEFING</a>
+      <a class="btn ghost" href="#mk1">LEARN MORE</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 2 / PRODUCT — MK-1 ==================== -->
+<section id="mk1">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <div>
+        <p class="lbl">01 // PLATFORM</p>
+        <h2>INTRODUCING <b>MK-1</b></h2>
+      </div>
+      <p class="sec-p">A 40-gram autonomous micro-UAV for the dismounted soldier. Pocket-launched, silent in flight, and aware of what it sees — <em>MK-1 puts a persistent eye where no one should go.</em></p>
+    </header>
+
+    <!-- ================================================================
+         WANT A REAL VIDEO HERE INSTEAD OF THE ANIMATED RENDER?
+         1. Put your file (e.g. mk1-loop.mp4) in the same folder as this HTML.
+         2. Delete the .par block below and replace it with:
+
+            <video class="stage-video" autoplay muted loop playsinline
+                   poster="mk1-first-frame.jpg" src="mk1-loop.mp4"></video>
+
+         3. Add this CSS:
+            .stage-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+         muted + playsinline are what allow autoplay in Chrome & Safari.
+    ================================================================= -->
+    <div class="stage reveal" id="stage">
+      <span class="stage-tag">SPEC RENDER — LIVE // HOLO-01</span>
+      <div class="tele" aria-hidden="true">
+        <div class="t-row"><span>MODE</span><b>HOVER</b></div>
+        <div class="t-row"><span>ALT</span><b id="t-alt">2.40 M</b></div>
+        <div class="t-row"><span>ROTOR</span><b id="t-rpm">12,400</b></div>
+        <div class="t-row"><span>BAT</span><b id="t-bat">87%</b></div>
+        <div class="t-row"><span>LINK</span><b class="bars" id="t-link"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></b></div>
+        <div class="t-row"><span>TEMP</span><b id="t-temp">34&deg;C</b></div>
+      </div>
+      <div class="rec"><i></i>REC <b id="uptime">00:00</b></div>
+
+      <div class="par" id="par">
+        <div class="floor" aria-hidden="true">
+          <div class="ring"></div><div class="ring d2"></div><div class="ring d3"></div>
+          <div class="drone-shadow" id="shadow"></div>
+        </div>
+        <div class="holo" id="holo">
+          <div class="spin" id="spin"></div>
+          <div class="scan" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="co tl"><span class="txt">DUCTED ROTOR &times;4 — &le;55 dB</span><span class="ln"></span><span class="dot"></span></div>
+      <div class="co tr rt"><span class="txt">DUAL EO / LWIR GIMBAL</span><span class="ln"></span><span class="dot"></span></div>
+      <div class="co bl"><span class="txt">GAP-8 NEURAL CORE</span><span class="ln"></span><span class="dot"></span></div>
+      <div class="co br rt"><span class="txt">PV SOLAR SKIN</span><span class="ln"></span><span class="dot"></span></div>
+    </div>
+
+    <div class="stats reveal">
+      <div class="stat"><span class="v"><b data-n="40">0</b><i>G</i></span><span>FLIGHT WEIGHT</span></div>
+      <div class="stat"><span class="v"><b data-n="2">0</b><i>KM</i></span><span>DATALINK RANGE</span></div>
+      <div class="stat"><span class="v"><b data-n="25">0</b><i>MIN</i></span><span>FLIGHT TIME</span></div>
+      <div class="stat"><span class="v"><b>DUAL</b><i>EO+IR</i></span><span>CAMERA PAYLOAD</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 3 / CAPABILITIES ==================== -->
+<section id="caps">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <div>
+        <p class="lbl">02 // CAPABILITIES</p>
+        <h2>EVERY ADVANTAGE.<br>ONE <b>AIRFRAME.</b></h2>
+      </div>
+      <p class="sec-p">Six systems on a 40-gram platform. Everything below ships on MK-1 — <em>nothing on this list is a roadmap item.</em></p>
+    </header>
+
+    <div class="caps reveal">
+      <article class="cap">
+        <span class="cap-idx">01</span>
+        <div class="cap-ic"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M5 12v8h5l7 6V6l-7 6H5Z"/>
+          <path d="M21 12c2.2 2.2 2.2 5.8 0 8M24.5 9c3.6 3.6 3.6 10.4 0 14"/>
+          <path d="M3 3l26 26" stroke="#FF3B30" stroke-width="1.8"/>
+        </svg></div>
+        <h3>SILENT OPERATION</h3>
+        <p>Ducted electric rotors hold an acoustic signature quieter than the wind they fly in.</p>
+        <span class="cap-spec">ACOUSTIC / &le;55 dB @ 50 M</span>
+      </article>
+
+      <article class="cap">
+        <span class="cap-idx">02</span>
+        <div class="cap-ic"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="16" cy="16" r="10"/>
+          <path d="M16 2v5M16 25v5M2 16h5M25 16h5"/>
+          <path d="M16 10.5c2.6 2.5 1.6 4.6 0 7c-1.6-2.4-2.6-4.5 0-7Z"/>
+          <circle cx="16" cy="20.6" r="1.3" fill="currentColor" stroke="none"/>
+        </svg></div>
+        <h3>THERMAL VISION</h3>
+        <p>LWIR thermal paints heat signatures through smoke, fog and zero-light conditions.</p>
+        <span class="cap-spec">SENSOR / LWIR 8&ndash;14 &micro;m</span>
+      </article>
+
+      <article class="cap">
+        <span class="cap-idx">03</span>
+        <div class="cap-ic"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="10" y="10" width="12" height="12"/>
+          <path d="M13 4v6M19 4v6M13 22v6M19 22v6M4 13h6M4 19h6M22 13h6M22 19h6"/>
+          <circle cx="13.5" cy="13.5" r="1.4" fill="currentColor" stroke="none"/>
+          <circle cx="18.5" cy="18.5" r="1.4" fill="currentColor" stroke="none"/>
+          <path d="M13.5 13.5l5 5M18.5 13.5v5"/>
+        </svg></div>
+        <h3>AI THREAT DETECTION</h3>
+        <p>The onboard neural core classifies personnel and vehicles with no datalink at all.</p>
+        <span class="cap-spec">COMPUTE / GAP-8 &middot; 8-CORE RISC-V</span>
+      </article>
+
+      <article class="cap">
+        <span class="cap-idx">04</span>
+        <div class="cap-ic"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M8 8l8 8M24 8l-8 8M8 24l8-8M24 24l-8-8M8 8h16M8 8v16M24 8v16M8 24h16"/>
+          <rect x="14" y="14" width="4" height="4" fill="currentColor" stroke="none"/>
+          <circle cx="8" cy="8" r="1.8" fill="currentColor" stroke="none"/>
+          <circle cx="24" cy="8" r="1.8" fill="currentColor" stroke="none"/>
+          <circle cx="8" cy="24" r="1.8" fill="currentColor" stroke="none"/>
+          <circle cx="24" cy="24" r="1.8" fill="currentColor" stroke="none"/>
+        </svg></div>
+        <h3>SWARM MODE</h3>
+        <p>Up to twelve airframes self-organise into one sensing, relaying swarm.</p>
+        <span class="cap-spec">MESH / 12 AIRFRAMES</span>
+      </article>
+
+      <article class="cap">
+        <span class="cap-idx">05</span>
+        <div class="cap-ic"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="9" cy="9" r="3.5"/>
+          <path d="M9 3.2v-2M14.8 9h2M9 14.8v2M13.2 4.8l1.4-1.4M4.8 4.8 3.4 3.4"/>
+          <rect x="13" y="15" width="15" height="12"/>
+          <path d="M18 15v12M23 15v12M13 19h15M13 23h15"/>
+        </svg></div>
+        <h3>SOLAR PERSISTENCE</h3>
+        <p>A photovoltaic skin trickle-charges loiter mode — standby measured in days.</p>
+        <span class="cap-spec">ENDURANCE / DAYS IN STANDBY</span>
+      </article>
+
+      <article class="cap">
+        <span class="cap-idx">06</span>
+        <div class="cap-ic"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="16" cy="7" r="1.7" fill="currentColor" stroke="none"/>
+          <path d="M11 11.5a7 7 0 0 1 10 0M7.5 8a12 12 0 0 1 17 0"/>
+          <rect x="11" y="18" width="10" height="9"/>
+          <path d="M13.5 18v-3a2.5 2.5 0 0 1 5 0v3"/>
+        </svg></div>
+        <h3>ENCRYPTED COMMS</h3>
+        <p>Frequency-hopping encrypted link with zero reliance on foreign satellites.</p>
+        <span class="cap-spec">LINK / FHSS &middot; AES-256</span>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 4 / COMPARISON ==================== -->
+<section id="compare">
+  <div class="wrap">
+    <header class="sec-head reveal">
+      <div>
+        <p class="lbl">03 // BENCHMARK</p>
+        <h2>THE BENCHMARK,<br><b>REWRITTEN.</b></h2>
+      </div>
+      <p class="sec-p">MK-1 against the Western standard-bearer, capability for capability. <em>Row by row, the import case collapses.</em></p>
+    </header>
+
+    <div class="tbl-wrap reveal">
+      <div class="cmp">
+        <div class="cmp-row head">
+          <span class="c-cap">CAPABILITY</span>
+          <span class="c-us">MK-1 — RAPT</span>
+          <span class="c-them">BLACK HORNET 3*</span>
+        </div>
+        <div class="cmp-row reveal" style="--d:.05s">
+          <span class="c-cap">UNIT PRICE</span>
+          <span class="c-us"><svg class="ic-ok" viewBox="0 0 16 16"><path d="M2 8.5 6.5 13 14 3.5" fill="none" stroke="#0066FF" stroke-width="2.2"/></svg>Fraction of import cost</span>
+          <span class="c-them"><svg class="ic-no" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3 3 13" fill="none" stroke="#FF3B30" stroke-width="2.2"/></svg>&asymp; &#8377;1.2 Cr per system</span>
+        </div>
+        <div class="cmp-row reveal" style="--d:.1s">
+          <span class="c-cap">THERMAL CAMERA</span>
+          <span class="c-us"><svg class="ic-ok" viewBox="0 0 16 16"><path d="M2 8.5 6.5 13 14 3.5" fill="none" stroke="#0066FF" stroke-width="2.2"/></svg>Dual-spectrum EO + LWIR</span>
+          <span class="c-them"><svg class="ic-no" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3 3 13" fill="none" stroke="#FF3B30" stroke-width="2.2"/></svg>Single monochrome IR</span>
+        </div>
+        <div class="cmp-row reveal" style="--d:.15s">
+          <span class="c-cap">SWARM</span>
+          <span class="c-us"><svg class="ic-ok" viewBox="0 0 16 16"><path d="M2 8.5 6.5 13 14 3.5" fill="none" stroke="#0066FF" stroke-width="2.2"/></svg>12-node mesh, native</span>
+          <span class="c-them"><svg class="ic-no" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3 3 13" fill="none" stroke="#FF3B30" stroke-width="2.2"/></svg>Not supported</span>
+        </div>
+        <div class="cmp-row reveal" style="--d:.2s">
+          <span class="c-cap">SOLAR MODE</span>
+          <span class="c-us"><svg class="ic-ok" viewBox="0 0 16 16"><path d="M2 8.5 6.5 13 14 3.5" fill="none" stroke="#0066FF" stroke-width="2.2"/></svg>PV skin standby charging</span>
+          <span class="c-them"><svg class="ic-no" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3 3 13" fill="none" stroke="#FF3B30" stroke-width="2.2"/></svg>None</span>
+        </div>
+        <div class="cmp-row reveal" style="--d:.25s">
+          <span class="c-cap">AI DETECTION</span>
+          <span class="c-us"><svg class="ic-ok" viewBox="0 0 16 16"><path d="M2 8.5 6.5 13 14 3.5" fill="none" stroke="#0066FF" stroke-width="2.2"/></svg>Onboard GAP-8 neural core</span>
+          <span class="c-them"><svg class="ic-no" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3 3 13" fill="none" stroke="#FF3B30" stroke-width="2.2"/></svg>Offboard processing</span>
+        </div>
+        <div class="cmp-row reveal" style="--d:.3s">
+          <span class="c-cap">MADE IN INDIA</span>
+          <span class="c-us"><svg class="ic-ok" viewBox="0 0 16 16"><path d="M2 8.5 6.5 13 14 3.5" fill="none" stroke="#0066FF" stroke-width="2.2"/></svg>Bengaluru — end to end</span>
+          <span class="c-them"><svg class="ic-no" viewBox="0 0 16 16"><path d="M3 3l10 10M13 3 3 13" fill="none" stroke="#FF3B30" stroke-width="2.2"/></svg>Imported (NO / US)</span>
+        </div>
+      </div>
+      <div class="verdict reveal" style="--d:.35s">
+        <b>6 : 0</b>
+        <div>
+          <span class="vt">FULL-SPECTRUM ADVANTAGE OVER THE IMPORTED BENCHMARK</span>
+          <p class="src">*ASSESSED AGAINST PUBLICLY LISTED TELEDYNE FLIR SPECIFICATIONS.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 5 / INDIA ==================== -->
+<section id="india">
+  <div class="wrap">
+    <div class="ig">
+      <div>
+        <p class="lbl reveal">04 // ORIGIN</p>
+        <h2 class="cascade">
+          <span class="reveal" style="--d:.05s">DESIGNED<b>.</b></span>
+          <span class="reveal" style="--d:.15s">BUILT<b>.</b></span>
+          <span class="reveal" style="--d:.25s">DEPLOYED<b>.</b></span>
+          <span class="reveal" style="--d:.35s">IN INDIA<b>.</b></span>
+        </h2>
+        <p class="india-p reveal" style="--d:.45s">MK-1 is designed in Bengaluru and built on an all-Indian supply chain — tuned for high altitude, 50&deg;C heat and contested electromagnetic environments. <em>No import licences. No foreign veto on your sovereignty.</em></p>
+        <div class="india-cta reveal" style="--d:.55s"><a class="btn" href="#contact">PARTNER WITH US</a></div>
+        <p class="india-badges reveal" style="--d:.65s">DPIIT-REGISTERED &nbsp;//&nbsp; iDEX TRACK &nbsp;//&nbsp; &ldquo;MAKE IN INDIA&rdquo; ALIGNED</p>
+      </div>
+
+      <figure class="geo reveal" style="--d:.2s">
+        <figcaption class="geo-head"><span>GEO-SECTOR // REPUBLIC OF INDIA</span><span class="live"><i></i>LIVE FEED</span></figcaption>
+        <div class="geo-body">
+          <svg class="map-svg" viewBox="0 0 300 380" role="img" aria-label="Map of India with RAPT operational nodes">
+            <defs><clipPath id="inClip"><path d="M116 22 132 30 144 26 150 40 164 40 172 62 186 74 196 96 204 118 214 128 224 128 244 118 268 110 286 116 290 132 278 144 262 148 268 166 276 184 266 196 252 188 240 196 236 214 226 236 234 262 240 292 234 318 216 348 198 312 188 282 176 252 160 228 140 218 118 220 94 202 64 192 82 176 98 152 86 130 96 104 108 82 100 60 108 40Z"/></clipPath></defs>
+            <path class="in-fill" d="M116 22 132 30 144 26 150 40 164 40 172 62 186 74 196 96 204 118 214 128 224 128 244 118 268 110 286 116 290 132 278 144 262 148 268 166 276 184 266 196 252 188 240 196 236 214 226 236 234 262 240 292 234 318 216 348 198 312 188 282 176 252 160 228 140 218 118 220 94 202 64 192 82 176 98 152 86 130 96 104 108 82 100 60 108 40Z"/>
+            <path class="in-dash" transform="translate(150 190) scale(1.035) translate(-150 -190)" d="M116 22 132 30 144 26 150 40 164 40 172 62 186 74 196 96 204 118 214 128 224 128 244 118 268 110 286 116 290 132 278 144 262 148 268 166 276 184 266 196 252 188 240 196 236 214 226 236 234 262 240 292 234 318 216 348 198 312 188 282 176 252 160 228 140 218 118 220 94 202 64 192 82 176 98 152 86 130 96 104 108 82 100 60 108 40Z"/>
+            <!-- radar sweep band, clipped to the subcontinent -->
+            <g clip-path="url(#inClip)">
+              <rect class="sweep" x="10" y="-20" width="280" height="16"><animate attributeName="y" values="-20;390" dur="6.5s" repeatCount="indefinite"/></rect>
+              <rect class="sweep-edge" x="10" y="-4" width="280" height="1.4"><animate attributeName="y" values="-4;406" dur="6.5s" repeatCount="indefinite"/></rect>
+            </g>
+            <!-- operational nodes -->
+            <g>
+              <circle cx="142" cy="86" r="2.4" fill="#5AA7FF"/>
+              <circle cx="142" cy="86" r="2.4" fill="none" stroke="#0066FF"><animate attributeName="r" values="2.4;15" dur="3s" begin="0s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="3s" begin="0s" repeatCount="indefinite"/></circle>
+              <text class="map-lbl" x="150" y="82">DELHI</text>
+            </g>
+            <g>
+              <circle cx="134" cy="226" r="2.4" fill="#5AA7FF"/>
+              <circle cx="134" cy="226" r="2.4" fill="none" stroke="#0066FF"><animate attributeName="r" values="2.4;15" dur="3s" begin=".8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="3s" begin=".8s" repeatCount="indefinite"/></circle>
+              <text class="map-lbl" x="142" y="238">MUMBAI</text>
+            </g>
+            <g>
+              <circle cx="176" cy="254" r="2.4" fill="#5AA7FF"/>
+              <circle cx="176" cy="254" r="2.4" fill="none" stroke="#0066FF"><animate attributeName="r" values="2.4;15" dur="3s" begin="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="3s" begin="1.6s" repeatCount="indefinite"/></circle>
+              <text class="map-lbl" x="184" y="250">HYDERABAD</text>
+            </g>
+            <g>
+              <circle cx="226" cy="206" r="2.4" fill="#5AA7FF"/>
+              <circle cx="226" cy="206" r="2.4" fill="none" stroke="#0066FF"><animate attributeName="r" values="2.4;15" dur="3s" begin="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".8;0" dur="3s" begin="2.4s" repeatCount="indefinite"/></circle>
+              <text class="map-lbl" x="196" y="196">KOLKATA</text>
+            </g>
+            <!-- HQ -->
+            <g>
+              <rect x="174" y="296" width="8" height="8" fill="#0066FF"/>
+              <rect x="174" y="296" width="8" height="8" fill="none" stroke="#0066FF">
+                <animate attributeName="x" values="174;163" dur="3s" repeatCount="indefinite"/>
+                <animate attributeName="y" values="296;285" dur="3s" repeatCount="indefinite"/>
+                <animate attributeName="width" values="8;30" dur="3s" repeatCount="indefinite"/>
+                <animate attributeName="height" values="8;30" dur="3s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values=".9;0" dur="3s" repeatCount="indefinite"/>
+              </rect>
+              <text class="map-lbl hq" x="188" y="304">RAPT HQ — BLR</text>
+            </g>
+          </svg>
+        </div>
+        <div class="geo-foot"><span>FIG.04 — OPERATIONAL THEATRE</span><span>GRID 2&deg; / NOT TO SCALE</span></div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 6 / CONTACT ==================== -->
+<section id="contact">
+  <div class="wrap">
+    <div class="cg">
+      <div>
+        <p class="lbl reveal">05 // CONTACT</p>
+        <h2 class="reveal" style="--d:.05s">OPEN A<br><b>CHANNEL.</b></h2>
+        <p class="c-info reveal" style="--d:.1s">Briefings, procurement, partnership and press. Every request is read by a human in Bengaluru — cleared enquiries get a response inside 48 hours.</p>
+        <div class="c-facts reveal" style="--d:.15s">
+          <div><span>RESPONSE</span><b>&le; 48 HOURS</b></div>
+          <div><span>HOURS</span><b>0900&ndash;1800 IST / MON&ndash;FRI</b></div>
+          <div><span>LOCATION</span><b>BENGALURU, INDIA</b></div>
+          <div><span>CLASSIFICATION</span><b>UNCLASSIFIED</b></div>
+        </div>
+      </div>
+
+      <div class="reveal" style="--d:.1s">
+        <div class="f-panel" id="f-panel">
+          <div class="f-head"><span>SECURE INTAKE FORM</span><b>TRNS-ENCRYPTED</b></div>
+          <form id="c-form" novalidate>
+            <div class="f-row">
+              <label for="f-name"><b>01</b> — FULL NAME *</label>
+              <input id="f-name" type="text" autocomplete="name" placeholder="e.g. Cmde. A. Sharma">
+              <span class="err" id="e-name">FIELD REQUIRED — IDENTIFY YOURSELF.</span>
+            </div>
+            <div class="f-row">
+              <label for="f-org"><b>02</b> — ORGANISATION *</label>
+              <input id="f-org" type="text" autocomplete="organization" placeholder="e.g. HQ IDS / DRDO / Cobalt Robotics">
+              <span class="err" id="e-org">FIELD REQUIRED — AFFILIATION NEEDED.</span>
+            </div>
+            <div class="f-row">
+              <label for="f-des"><b>03</b> — DESIGNATION</label>
+              <input id="f-des" type="text" autocomplete="organization-title" placeholder="e.g. Director, Procurement">
+            </div>
+            <div class="f-row">
+              <label for="f-pur"><b>04</b> — PURPOSE</label>
+              <select id="f-pur">
+                <option>REQUEST BRIEFING</option>
+                <option>PROCUREMENT ENQUIRY</option>
+                <option>PARTNERSHIP / COLLABORATION</option>
+                <option>MEDIA &amp; PRESS</option>
+                <option>OTHER</option>
+              </select>
+            </div>
+            <button class="btn" type="submit" style="width:100%">SUBMIT REQUEST
+              <svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M3 12h17M14 5l7 7-7 7"/></svg>
+            </button>
+            <p class="f-note">TRANSMISSION ENCRYPTED IN TRANSIT — SPECULATIVE REQUESTS ARE DISCARDED.</p>
+          </form>
+        </div>
+        <div class="f-mail">
+          <a href="mailto:contact@raptdefence.in">DIRECT: contact@raptdefence.in</a>
+          <button id="copy-mail" type="button">COPY</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <span class="fn">RAPT DEFENCE SYSTEMS — MICRO-UAV PLATFORMS / BENGALURU, INDIA</span>
+      <nav class="foot-links">
+        <a href="#mk1">MK-1</a><a href="#caps">CAPABILITIES</a><a href="#compare">COMPARISON</a><a href="#contact">CONTACT</a>
+      </nav>
+    </div>
+    <div class="foot-bot">
+      <span>&copy; 2025 RAPT DEFENCE SYSTEMS PVT. LTD.</span>
+      <span>MADE IN INDIA — 12.97&deg; N / 77.59&deg; E</span>
+      <span>UNCLASSIFIED // PUBLIC RELEASE</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ============ TOAST ============ */
+function toast(msg){
+  const t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M2 12.5 9 19 22 5"/></svg><span>${msg}</span>`;
+  $('#toasts').append(t);
+  setTimeout(()=>t.classList.add('out'),3400);
+  setTimeout(()=>t.remove(),3900);
+}
+
+/* ============ HERO PARTICLES ============ */
+(function(){
+  const hero=$('#hero'), cv=$('#pcv'), ctx=cv.getContext('2d');
+  const DPR=Math.min(2,devicePixelRatio||1);
+  let W,H,ps=[],on=false,mx=-9999,my=-9999;
+  function size(){
+    W=hero.clientWidth; H=hero.clientHeight;
+    cv.width=W*DPR; cv.height=H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    const n=Math.max(42,Math.min(110,Math.round(W*H/16000)));
+    ps=Array.from({length:n},()=>({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3,
+      r:.8+Math.random()*1.1, w:Math.random()<.16
+    }));
+  }
+  size(); addEventListener('resize',size);
+  hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;});
+  hero.addEventListener('pointerleave',()=>{mx=my=-9999;});
+  function draw(){
+    if(!on) return;
+    ctx.clearRect(0,0,W,H);
+    for(const p of ps){
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+      const dx=p.x-mx, dy=p.y-my, d2=dx*dx+dy*dy;
+      if(d2<16900){const d=Math.sqrt(d2)||1,f=(130-d)/130*.4; p.x+=dx/d*f; p.y+=dy/d*f;}
+    }
+    ctx.lineWidth=1;
+    for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+      const a=ps[i],b=ps[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy;
+      if(d2<13225){
+        ctx.strokeStyle=`rgba(0,102,255,${(1-Math.sqrt(d2)/115)*.15})`;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+      }
+    }
+    for(const p of ps){
+      ctx.fillStyle=p.w?'rgba(205,212,224,.5)':'rgba(60,130,255,.62)';
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  if(REDUCED){ on=true; draw(); on=false; }
+  else new IntersectionObserver(es=>es.forEach(e=>{
+    const was=on; on=e.isIntersecting;
+    if(on&&!was) requestAnimationFrame(draw);
+  }),{threshold:.02}).observe(hero);
+})();
+
+/* ============ MK-1 HOLOGRAM — drone built in code ============ */
+const BLUE='#0066FF', BHI='#5AA7FF';
+function buildDrone(){
+  const quads=[[1,1],[1,-1],[-1,-1],[-1,1]];
+  let arms='',ducts='';
+  quads.forEach((q,i)=>{
+    const cx=100*q[0], cy=100*q[1];
+    arms+=`<line x1="${42*q[0]}" y1="${42*q[1]}" x2="${cx}" y2="${cy}" stroke="#16161c" stroke-width="26"/>`
+        +`<line x1="${42*q[0]}" y1="${42*q[1]}" x2="${cx}" y2="${cy}" stroke="#2b2b33" stroke-width="1"/>`;
+    ducts+=`<g transform="translate(${cx} ${cy})">
+      <circle r="57" fill="#0b0b0f" stroke="#1f1f26" stroke-width="1.5"/>
+      <circle r="51" fill="none" stroke="#2d2d35" stroke-width="5"/>
+      <g class="blades" style="animation-delay:${(-0.13*i).toFixed(2)}s">
+        <circle r="41" fill="rgba(90,167,255,.05)"/>
+        <circle r="41" fill="none" stroke="rgba(90,167,255,.14)"/>
+        <line x1="-37" y1="0" x2="37" y2="0" stroke="#3a3a43" stroke-width="6"/>
+        <line x1="-37" y1="0" x2="37" y2="0" stroke="#3a3a43" stroke-width="6" transform="rotate(60)"/>
+        <line x1="-37" y1="0" x2="37" y2="0" stroke="#3a3a43" stroke-width="6" transform="rotate(120)"/>
+      </g>
+      <circle r="9" fill="#15161b" stroke="#38383f" stroke-width="1.5"/>
+      <circle r="3" fill="${BLUE}"/>
+      <circle class="led" r="2.4" cy="-46" fill="${BHI}" style="animation-delay:${(-0.47*i).toFixed(2)}s"/>
+    </g>`;
+  });
+  return `<svg viewBox="-210 -210 420 420" aria-label="MK-1 micro UAV — rotating render">
+    <g class="rim">
+      <circle r="184" fill="none" stroke="rgba(0,102,255,.28)" stroke-dasharray="3 14"/>
+      <line x1="-196" y1="0" x2="-180" y2="0" stroke="rgba(0,102,255,.5)"/>
+      <line x1="180" y1="0" x2="196" y2="0" stroke="rgba(0,102,255,.5)"/>
+      <line x1="0" y1="-196" x2="0" y2="-180" stroke="rgba(0,102,255,.5)"/>
+      <line x1="0" y1="180" x2="0" y2="196" stroke="rgba(0,102,255,.5)"/>
+    </g>
+    ${arms}${ducts}
+    <g>
+      <path d="M-66 -28 L-28 -66 L28 -66 L66 -28 L66 28 L28 66 L-28 66 L-66 28 Z" fill="#121218" stroke="#34343d" stroke-width="2"/>
+      <path d="M-52 -20 L-20 -52 L20 -52 L52 -20 L52 20 L20 52 L-20 52 L-52 20 Z" fill="none" stroke="#20202a" stroke-width="1.5"/>
+      <rect x="-58" y="-11" width="15" height="22" fill="none" stroke="rgba(0,102,255,.4)"/>
+      <line x1="-58" y1="-3.7" x2="-43" y2="-3.7" stroke="rgba(0,102,255,.25)"/>
+      <line x1="-58" y1="3.7" x2="-43" y2="3.7" stroke="rgba(0,102,255,.25)"/>
+      <rect x="43" y="-11" width="15" height="22" fill="none" stroke="rgba(0,102,255,.4)"/>
+      <line x1="43" y1="-3.7" x2="58" y2="-3.7" stroke="rgba(0,102,255,.25)"/>
+      <line x1="43" y1="3.7" x2="58" y2="3.7" stroke="rgba(0,102,255,.25)"/>
+      <rect x="-17" y="7" width="34" height="24" fill="#0c0c11" stroke="#38383f" stroke-width="1.5"/>
+      <line x1="-17" y1="13" x2="-22" y2="13" stroke="#38383f"/><line x1="-17" y1="19" x2="-22" y2="19" stroke="#38383f"/><line x1="-17" y1="25" x2="-22" y2="25" stroke="#38383f"/>
+      <line x1="17" y1="13" x2="22" y2="13" stroke="#38383f"/><line x1="17" y1="19" x2="22" y2="19" stroke="#38383f"/><line x1="17" y1="25" x2="22" y2="25" stroke="#38383f"/>
+      <text x="0" y="23" text-anchor="middle" class="chipTxt">GAP-8</text>
+      <circle cx="0" cy="-34" r="16" fill="#08080b" stroke="#3c3c46" stroke-width="2"/>
+      <circle cx="0" cy="-34" r="7.5" fill="none" stroke="${BLUE}" stroke-width="1.5"/>
+      <line x1="0" y1="-52" x2="0" y2="-46" stroke="#3c3c46"/><line x1="0" y1="-22" x2="0" y2="-16" stroke="#3c3c46"/>
+      <line x1="-18" y1="-34" x2="-12" y2="-34" stroke="#3c3c46"/><line x1="12" y1="-34" x2="18" y2="-34" stroke="#3c3c46"/>
+      <circle cx="2.6" cy="-36.6" r="1.6" fill="${BHI}"/>
+      <rect x="19" y="-45" width="13" height="13" fill="#08080b" stroke="#3c3c46" stroke-width="1.5"/>
+      <circle cx="25.5" cy="-38.5" r="3.4" fill="none" stroke="${BLUE}" stroke-width="1.2"/>
+      <line x1="0" y1="52" x2="0" y2="63" stroke="#38383f" stroke-width="1.5"/>
+      <circle class="beacon" cx="0" cy="66" r="2.6" fill="${BHI}"/>
+      <text x="0" y="46" text-anchor="middle" class="bodyTxt">MK-1 &#183; RAPT</text>
+    </g>
+  </svg>`;
+}
+const spin=$('#spin');
+if(spin) spin.innerHTML=buildDrone();
+
+/* turntable loop: rotation + hover bob + shadow + callout pulses + mouse tilt */
+(function(){
+  const stage=$('#stage'); if(!stage) return;
+  const holo=$('#holo'), shadow=$('#shadow'), par=$('#par');
+  const cos=$$('.co');
+  let ang=14, last=performance.now(), lastQ=-1, run=false, t0=performance.now();
+  let trx=0, try_=0, crx=0, cry=0;
+  stage.addEventListener('pointermove',e=>{
+    const r=stage.getBoundingClientRect();
+    try_=((e.clientX-r.left)/r.width-.5)*7;
+    trx=-((e.clientY-r.top)/r.height-.5)*5;
+  });
+  stage.addEventListener('pointerleave',()=>{trx=try_=0;});
+  if(REDUCED){ spin.style.transform='rotate(24deg)'; return; }
+  function frame(now){
+    if(!run) return;
+    const dt=Math.min(.05,(now-last)/1000); last=now;
+    const t=(now-t0)/1000;
+    ang+=dt*10.6;                                   // ~34 s per revolution
+    const bob=Math.sin(t*1.15)*9;                   // hover bob
+    holo.style.transform=`translate(-50%,-50%) translateY(${bob.toFixed(1)}px)`;
+    spin.style.transform=`rotate(${(ang%360).toFixed(2)}deg)`;
+    shadow.style.transform=`translate(-50%,-50%) scale(${(1-(bob+9)*.008).toFixed(3)})`;
+    shadow.style.opacity=(.68-(bob+9)*.012).toFixed(2);
+    // mouse tilt (lerped)
+    crx+=(trx-crx)*.07; cry+=(try_-cry)*.07;
+    par.style.setProperty('--rx',crx.toFixed(2)+'deg');
+    par.style.setProperty('--ry',cry.toFixed(2)+'deg');
+    // pulse HUD callouts each quarter revolution, when a duct passes
+    const q=Math.floor(ang/90);
+    if(q!==lastQ){
+      lastQ=q;
+      cos.forEach(el=>{
+        el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse');
+        setTimeout(()=>el.classList.remove('pulse'),480);
+      });
+    }
+    requestAnimationFrame(frame);
+  }
+  new IntersectionObserver(es=>es.forEach(e=>{
+    const was=run; run=e.isIntersecting;
+    if(run&&!was){ last=performance.now(); requestAnimationFrame(frame); }
+  }),{threshold:.05}).observe(stage);
+})();
+
+/* live telemetry */
+(function(){
+  const alt=$('#t-alt'), rpm=$('#t-rpm'), bat=$('#t-bat'), temp=$('#t-temp'),
+        link=$('#t-link'), up=$('#uptime');
+  if(!alt) return;
+  let b=87, start=Date.now();
+  setInterval(()=>{
+    alt.textContent=(2.38+Math.random()*.07).toFixed(2)+' M';
+    rpm.textContent=(12380+Math.round(Math.random()*320)).toLocaleString('en-IN');
+    b=Math.max(80,b-.1); if(b<=80) b=87;
+    bat.textContent=b.toFixed(0)+'%';
+    temp.textContent=(33+Math.round(Math.random()*3))+'\u00B0C';
+    const bars=4+(Math.random()<.5?1:0);
+    [...link.children].forEach((i,k)=>i.classList.toggle('on',k<bars));
+    const s=Math.floor((Date.now()-start)/1000);
+    up.textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+  },700);
+})();
+
+/* ============ STAT COUNTERS ============ */
+new IntersectionObserver((es,obs)=>es.forEach(en=>{
+  if(!en.isIntersecting) return;
+  en.target.querySelectorAll('b[data-n]').forEach(el=>{
+    const t=+el.dataset.n, st=performance.now();
+    (function f(n){const p=Math.min(1,(n-st)/1200);
+      el.textContent=Math.round(t*(1-Math.pow(1-p,3)));
+      if(p<1) requestAnimationFrame(f);})(st);
+  });
+  obs.unobserve(en.target);
+}),{threshold:.4}).observe($('.stats'));
+
+/* ============ REVEAL ============ */
+const rObs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){ e.target.classList.add('in'); rObs.unobserve(e.target); }
+}),{threshold:.12});
+ $$('.reveal').forEach(el=>rObs.observe(el));
+
+/* ============ NAV ============ */
+addEventListener('scroll',()=>$('#topbar').classList.toggle('solid',scrollY>10),{passive:true});
+const burger=$('#burger'), nlinks=$('#nav-links');
+burger.addEventListener('click',()=>{ nlinks.classList.toggle('open'); burger.classList.toggle('on'); });
+nlinks.addEventListener('click',e=>{ if(e.target.tagName==='A'){ nlinks.classList.remove('open'); burger.classList.remove('on'); } });
+const sObs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting) return;
+  $$('.nav-links a').forEach(a=>a.classList.toggle('act',a.getAttribute('href')==='#'+e.target.id));
+}),{rootMargin:'-40% 0px -55% 0px'});
+['mk1','caps','compare','india','contact'].forEach(id=>sObs.observe(document.getElementById(id)));
+
+/* ============ FORM ============ */
+ $('#c-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const name=$('#f-name'), org=$('#f-org');
+  let ok=true;
+  const flag=(inp,err,bad)=>{ $(err).classList.toggle('on',bad); inp.classList.toggle('bad',bad); if(bad) ok=false; };
+  flag(name,'#e-name',name.value.trim().length<2);
+  flag(org,'#e-org',org.value.trim().length<2);
+  if(!ok){ toast('TWO FIELDS NEED ATTENTION'); return; }
+  const ref='RD-'+Math.floor(1000+Math.random()*9000);
+  const first=name.value.trim().split(/\s+/)[0].toUpperCase();
+  $('#f-panel').innerHTML=`
+    <div class="f-done">
+      <span class="lbl">TRANSMISSION LOGGED — ${ref}</span>
+      <h3>REQUEST RECEIVED.</h3>
+      <p>Thank you, ${first}. Your ${$('#f-pur').value.toLowerCase()} has been routed to the programmes team. Cleared enquiries receive a response within 48 hours on the channel you provided.</p>
+      <div class="dm">
+        <div><span>REFERENCE</span><b>${ref}</b></div>
+        <div><span>PURPOSE</span><b>${$('#f-pur').value}</b></div>
+        <div><span>RESPONSE</span><b>&le; 48 HRS</b></div>
+      </div>
+      <button class="btn ghost" id="f-again" type="button">SUBMIT ANOTHER</button>
+    </div>`;
+  toast('REQUEST LOGGED — '+ref);
+  $('#f-again').addEventListener('click',()=>location.reload());
+});
+['#f-name','#f-org'].forEach(id=>$(id).addEventListener('input',e=>{
+  e.target.classList.remove('bad');
+  const err=id==='#f-name'?'#e-name':'#e-org';
+  $(err).classList.remove('on');
+}));
+
+/* ============ COPY EMAIL ============ */
+ $('#copy-mail').addEventListener('click',()=>{
+  const mail='contact@raptdefence.in';
+  if(navigator.clipboard){ navigator.clipboard.writeText(mail).then(()=>toast('COPIED — '+mail.toUpperCase())); }
+  else{
+    const ta=document.createElement('textarea'); ta.value=mail; document.body.append(ta);
+    ta.select(); document.execCommand('copy'); ta.remove(); toast('COPIED — '+mail.toUpperCase());
+  }
+});
+</script>
+</body>
+</html>
